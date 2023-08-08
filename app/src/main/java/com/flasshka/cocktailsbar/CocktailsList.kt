@@ -11,4 +11,8 @@ object CocktailsList {
     fun PutCocktail(cocktail: Cocktail) {
         cocktails.add(cocktail)
     }
+
+    fun Remove(cocktail: Cocktail) {
+        cocktails.remove(cocktail)
+    }
 }

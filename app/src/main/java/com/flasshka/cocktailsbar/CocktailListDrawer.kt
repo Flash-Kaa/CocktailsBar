@@ -1,5 +1,8 @@
 package com.flasshka.cocktailsbar
 
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -26,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -34,12 +38,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 
-class CocktailListDrawer {
+object CocktailListDrawer {
     private val drawDescriptionOfCocktail: MutableState<Cocktail?> = mutableStateOf(null)
+    var bundle: Bundle = Bundle()
 
     @Composable
     fun Draw() {
-        if(drawDescriptionOfCocktail.value != null) {
+        if(CocktailsList.Count() == 0) {
+            DrawEmptyList(
+                modifier = Modifier.fillMaxSize(),
+                margin = 20.dp
+            )
+        }
+        else if(drawDescriptionOfCocktail.value != null) {
             DrawCocktail(
                 cocktail = drawDescriptionOfCocktail.value!!,
                 modifier = Modifier.fillMaxSize(),
@@ -111,6 +122,8 @@ class CocktailListDrawer {
         backSize: Dp = 50.dp,
         modifier: Modifier = Modifier
     ) {
+        val context = LocalContext.current
+
         ConstraintLayout(
             modifier = modifier
         ) {
@@ -130,8 +143,6 @@ class CocktailListDrawer {
                         end.linkTo(parent.end)
                     }
             )
-
-
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -156,7 +167,9 @@ class CocktailListDrawer {
                 WriteText(text = cocktail.Recipe, fontSize = descriptionTextSize, margin)
 
                 Button(
-                    onClick = { TODO() },
+                    onClick = {
+                        SendCocktailsToEdit(cocktail, context)
+                    },
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(Color.Blue),
                     modifier = Modifier
@@ -166,6 +179,22 @@ class CocktailListDrawer {
                 }
             }
         }
+    }
+
+    private fun SendCocktailsToEdit(
+        cocktail: Cocktail,
+        context: Context
+    ) {
+        val intent = Intent(context, CreatingCocktail::class.java)
+        bundle.putString(BundleKeys.Title.toString(), cocktail.Title)
+        bundle.putString(BundleKeys.Description.toString(), cocktail.Description)
+        bundle.putString(BundleKeys.Recipe.toString(), cocktail.Recipe)
+        bundle.putStringArray(BundleKeys.Ingredients.toString(), cocktail.Ingredients)
+
+        intent.putExtras(bundle)
+
+        CocktailsList.Remove(cocktail)
+        context.startActivity(intent)
     }
 
     @Composable
@@ -252,6 +281,7 @@ class CocktailListDrawer {
         imageSize: Dp,
         modifier: Modifier = Modifier
     ) {
+        val context = LocalContext.current
 
         Image(
             painter = painterResource(id = R.drawable.add_btn),
@@ -259,7 +289,7 @@ class CocktailListDrawer {
             modifier = modifier
                 .size(imageSize)
                 .clickable {
-                    TODO()
+                    context.startActivity(Intent(context, CreatingCocktail::class.java))
                 }
         )
     }

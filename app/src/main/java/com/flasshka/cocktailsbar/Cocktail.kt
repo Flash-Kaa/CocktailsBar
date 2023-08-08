@@ -9,7 +9,6 @@ data class Cocktail(
     private var ingredients: Array<String>,
     private var image: Image? = null
 ) {
-
     var Title: String
         get() = title
         private set(value) {
@@ -54,8 +53,6 @@ data class Cocktail(
         this.image = image
     }
 
-
-
     override fun equals(other: Any?): Boolean {
         if (javaClass != other?.javaClass) return false
 
@@ -65,5 +62,4 @@ data class Cocktail(
     override fun hashCode(): Int {
         return title.hashCode()
     }
-
 }
